@@ -1,7 +1,11 @@
+// ignore_for_file: unnecessary_question_mark
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dropdown/flutter_dropdown.dart';
 import 'package:flutterapps/ApiHandler/ApiController.dart';
+import 'package:flutterapps/GetxControllers/CategoryGetModel.dart';
 import 'package:flutterapps/GetxControllers/listingScrnController.dart';
 import 'package:flutterapps/model/VideoPost.dart';
 import 'package:flutterapps/model/VideoModel.dart';
@@ -19,6 +23,8 @@ class ListingsScreen extends StatefulWidget {
 
 class _ListingsState extends State<ListingsScreen> {
   var listingController = Get.put(ListingScreenController());
+  List<String> locations = ['A', 'B', 'C', 'D'];
+  String? _selectedLocation;
 
   @override
   void initState() {
@@ -36,6 +42,7 @@ class _ListingsState extends State<ListingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log('this isssssssssssssssssssssssssssssssssss----------------------=======================${listingController.categoryIdList}');
     return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -53,13 +60,17 @@ class _ListingsState extends State<ListingsScreen> {
               title: 'Upload Video',
               content: Column(
                 children: [
-                  TextFormField(
-                    controller: listingController.categoryTextController,
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: 'Category ID',
-                    ),
+                  //dropdown ///////////
+                  DropDown<String?>(
+                    items: listingController.categoryIdList.value,
+                    hint: Text('choose category'),
+                    showUnderline: false,
+                    onChanged: (val) {
+                      listingController.idOfCategory.value =
+                          listingController.categoryIdList.indexOf(val);
+                      print('${listingController.idOfCategory.value}');
+                      print(val);
+                    },
                   ),
                   TextFormField(
                     controller: listingController.titleTextController,
@@ -129,8 +140,7 @@ class _ListingsState extends State<ListingsScreen> {
               actions: [
                 ElevatedButton(
                     onPressed: () {
-                      if (listingController
-                              .categoryTextController.text.isEmpty &&
+                      if (listingController.idOfCategory.value == 0 &&
                           listingController.titleTextController.text.isEmpty &&
                           listingController
                               .descriptionTextController.text.isEmpty) {
@@ -357,13 +367,17 @@ class _ListingsState extends State<ListingsScreen> {
             title: 'Update Video',
             content: Column(
               children: [
-                TextFormField(
-                  controller: listingController.categoryTextController,
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hintText: 'Category ID',
-                  ),
+                //drop down
+                DropDown<String?>(
+                  items: listingController.categoryIdList.value,
+                  hint: Text('choose category'),
+                  showUnderline: false,
+                  onChanged: (val) {
+                    listingController.idOfCategory.value =
+                        listingController.categoryIdList.indexOf(val);
+                    print('${listingController.idOfCategory.value}');
+                    print(val);
+                  },
                 ),
                 TextFormField(
                   controller: listingController.titleTextController,
@@ -433,7 +447,7 @@ class _ListingsState extends State<ListingsScreen> {
             actions: [
               ElevatedButton(
                   onPressed: () {
-                    if (listingController.categoryTextController.text.isEmpty &&
+                    if (listingController.idOfCategory.value == 0 &&
                         listingController.titleTextController.text.isEmpty &&
                         listingController
                             .descriptionTextController.text.isEmpty) {

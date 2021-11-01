@@ -1,6 +1,11 @@
+// ignore_for_file: unrelated_type_equality_checks
+
+import 'dart:developer';
 import 'dart:io';
 import 'package:dio/dio.dart' as dio;
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterapps/GetxControllers/CategoryGetModel.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -11,8 +16,19 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class ListingScreenController extends GetxController {
   var videoCategoryPosts = [].obs;
+  var categoryIdList = <String?>[].obs;
+  var categoryNameList = [].obs;
+  var idOfCategory = 0.obs;
+
+  @override
+  void onInit() {
+    getCategoryMethod();
+    
+    super.onInit();
+  }
 
   TextEditingController categoryTextController = TextEditingController();
+
   TextEditingController titleTextController = TextEditingController();
 
   TextEditingController descriptionTextController = TextEditingController();
@@ -35,6 +51,7 @@ class ListingScreenController extends GetxController {
       // image.value = pickedFile!;
       // print(
       //     'imageeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee ${image.value.path}');
+
     } catch (e) {}
   }
 
@@ -69,19 +86,19 @@ class ListingScreenController extends GetxController {
     } catch (e) {}
   }
 
-  compressVideo(PickedFile? f) async {
-    final filePath = f!.path;
-    final MediaInfo? mediaInfo = await VideoCompress.compressVideo(
-      filePath,
-      quality: VideoQuality.DefaultQuality,
-      deleteOrigin: false,
-      includeAudio: true,
-    );
-    video.value = mediaInfo!.file!;
+  // compressVideo(PickedFile? f) async {
+  //   final filePath = f!.path;
+  //   final MediaInfo? mediaInfo = await VideoCompress.compressVideo(
+  //     filePath,
+  //     quality: VideoQuality.DefaultQuality,
+  //     deleteOrigin: false,
+  //     includeAudio: true,
+  //   );
+  //   video.value = mediaInfo!.file!;
 
-    print(
-        'this is coompressed video ========= ${video.value.path} and its size is ${mediaInfo.filesize}');
-  }
+  //   print(
+  //       'this is coompressed video ========= ${video.value.path} and its size is ${mediaInfo.filesize}');
+  // }
 
   Future uploadVideoToNetwork() async {
     dio.FormData formData = dio.FormData.fromMap({
@@ -169,6 +186,37 @@ class ListingScreenController extends GetxController {
     print('response data is = ${response.data}');
   }
 
+  // api category get method
+  // 1st thing first
+
+  Future getCategoryMethod() async {
+    Dio dio = Dio();
+
+    try {
+      var url = 'https://starwebapk.com/mobile_api/public/api/get/categorydata';
+      var response = await dio.get(url);
+      print('response is ......== $response');
+      var getResponse = response.data;
+      CategoryGetModel getModel = CategoryGetModel.fromJson(getResponse);
+      log('Status = ${getResponse['status']}');
+      log('this is data  ${getResponse['data']}');
+
+     
+      (getResponse['data'] as List).forEach((e) => categoryIdList.add(e['name']));
+      log('thisis new list $categoryIdList');
+
+      if (getModel.status == true) {
+        print('this is the actual datafor the api =p===-==-=-=-==- ${getModel.data}');
+        categoryIdList.value = getModel.data!.map((v) => v.name).toList();
+
+        
+       
+
+        log('My Category List is .................,><>< ${categoryIdList}');
+      }
+    } catch (e) {}
+  }
+
   dismissDialog() {
     categoryTextController.text = '';
     descriptionTextController.text = '';
@@ -176,4 +224,10 @@ class ListingScreenController extends GetxController {
     image.value = File('');
     videoFile = File('');
   }
+
+  // copyMyList(){
+  //   categoryNameList.value = categoryIdList.map((element) => element!.image).toList();
+  //   print("ooooooooooooooooooooooooooooooooooooppppppppppppppppppppppppppppppppppppp$categoryNameList");
+  // }
 }
+
