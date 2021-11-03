@@ -11,6 +11,7 @@ class VideoPost {
 
   VideoPost();
 
-  factory VideoPost.fromJson(Map<String, dynamic> json) => _$VideoPostFromJson(json);
+  factory VideoPost.fromJson(Map<String, dynamic> json) =>
+      _$VideoPostFromJson(json);
   Map<String, dynamic> toJson() => _$VideoPostToJson(this);
 }

@@ -62,16 +62,26 @@ class _ListingsState extends State<ListingsScreen> {
                 children: [
                   //dropdown ///////////
                   DropDown<String?>(
-                    items: listingController.categoryIdList.value,
+                    items: listingController.categoryIdList,
                     hint: Text('choose category'),
                     showUnderline: false,
                     onChanged: (val) {
                       listingController.idOfCategory.value =
-                          listingController.categoryIdList.indexOf(val);
-                      print('${listingController.idOfCategory.value}');
-                      print(val);
+                          listingController.categoryIdList.indexOf(val) + 1;
+
+                      // // listingController.ListOfCategoryIDfromAPI
+                      // List res = listingController.categoryAllList
+                      //     .where((item) => listingController
+                      //         .listOfCategoryIDfromAPI
+                      //         .contains(item.id))
+                      //     .toList();
+                      // log('res is {$res}');
+
+                      log('id index val is =${listingController.idOfCategory.value}');
+                      log('val is $val');
                     },
                   ),
+
                   TextFormField(
                     controller: listingController.titleTextController,
                     textInputAction: TextInputAction.next,
@@ -206,6 +216,7 @@ class _ListingsState extends State<ListingsScreen> {
   Widget _getListItemUI(BuildContext context, int index,
       {double imgwidth: 200.0}) {
     VideoPost currentPost = listingController.videoCategoryPosts[index];
+
     print(
         'wwwwwwwwwwwwwwwwwwwww${currentPost.name} wwwwwwwwww ${currentPost.post!.length}');
 
@@ -266,6 +277,8 @@ class _ListingsState extends State<ListingsScreen> {
   }
 
   Widget _getVideoItemUI(VideoModel video) {
+    listingController.videoIDForUpdateApi.value = video.id as int;
+    log('this is the video id = = = = = =  = ${listingController.videoIDForUpdateApi.value} . . . .  ${video.id}');
     return AspectRatio(
       aspectRatio: 1.8 / 1,
       child: InkWell(
@@ -369,14 +382,23 @@ class _ListingsState extends State<ListingsScreen> {
               children: [
                 //drop down
                 DropDown<String?>(
-                  items: listingController.categoryIdList.value,
+                  items: listingController.categoryIdList,
                   hint: Text('choose category'),
                   showUnderline: false,
                   onChanged: (val) {
                     listingController.idOfCategory.value =
-                        listingController.categoryIdList.indexOf(val);
-                    print('${listingController.idOfCategory.value}');
-                    print(val);
+                        listingController.categoryIdList.indexOf(val) + 1;
+
+                    // // listingController.ListOfCategoryIDfromAPI
+                    // List res = listingController.categoryAllList
+                    //     .where((item) => listingController
+                    //         .listOfCategoryIDfromAPI
+                    //         .contains(item.id))
+                    //     .toList();
+                    // log('res is {$res}');
+
+                    log('id index val is =${listingController.idOfCategory.value}');
+                    log('val is $val');
                   },
                 ),
                 TextFormField(

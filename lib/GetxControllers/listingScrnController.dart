@@ -19,15 +19,19 @@ class ListingScreenController extends GetxController {
   var categoryIdList = <String?>[].obs;
   var categoryNameList = [].obs;
   var idOfCategory = 0.obs;
+  var listOfCategoryIDfromAPI = <int?>[].obs;
+  var categoryAllList = [].obs;
+
+  var videoIDForUpdateApi = 0.obs;
 
   @override
   void onInit() {
     getCategoryMethod();
-    
+
     super.onInit();
   }
 
-  TextEditingController categoryTextController = TextEditingController();
+  // TextEditingController categoryTextController = TextEditingController();
 
   TextEditingController titleTextController = TextEditingController();
 
@@ -111,7 +115,7 @@ class ListingScreenController extends GetxController {
     });
 
     final response = await dio.Dio().post(
-      'https://starwebapk.com/mobile_api/public/api/createpost?category_id=${categoryTextController.text}&title=${titleTextController.text}&description=${descriptionTextController.text}&is_premium=1',
+      'https://starwebapk.com/mobile_api/public/api/createpost?category_id=${idOfCategory.value}&title=${titleTextController.text}&description=${descriptionTextController.text}&is_premium=1',
       data: formData,
       options: dio.Options(
         followRedirects: false,
@@ -154,7 +158,7 @@ class ListingScreenController extends GetxController {
     });
 
     final response = await dio.Dio().post(
-      'https://starwebapk.com/mobile_api/public/api/updatepost/4?category_id=${categoryTextController.text}&title=${titleTextController.text}&description=${descriptionTextController.text}&is_premium=1',
+      'https://starwebapk.com/mobile_api/public/api/updatepost/${videoIDForUpdateApi.value}?category_id=${idOfCategory.value}&title=${titleTextController.text}&description=${descriptionTextController.text}&is_premium=1',
       data: formData,
       options: dio.Options(
         followRedirects: false,
@@ -165,6 +169,8 @@ class ListingScreenController extends GetxController {
     );
     if (response.data['status'] == true) {
       // isLoading.value = true;
+      print(
+          'this is the id of this current video ${videoIDForUpdateApi.value}');
       EasyLoading.dismiss();
       Get.snackbar(
         'congrats!',
@@ -201,16 +207,17 @@ class ListingScreenController extends GetxController {
       log('Status = ${getResponse['status']}');
       log('this is data  ${getResponse['data']}');
 
-     
-      (getResponse['data'] as List).forEach((e) => categoryIdList.add(e['name']));
+      (getResponse['data'] as List)
+          .forEach((e) => categoryIdList.add(e['name']));
       log('thisis new list $categoryIdList');
 
       if (getModel.status == true) {
-        print('this is the actual datafor the api =p===-==-=-=-==- ${getModel.data}');
+        print(
+            'this is the actual datafor the api =p===-==-=-=-==- ${getModel.data}');
+        categoryAllList.value = getModel.data!.map((e) => e).toList();
         categoryIdList.value = getModel.data!.map((v) => v.name).toList();
-
-        
-       
+        listOfCategoryIDfromAPI.value =
+            getModel.data!.map((i) => i.id).toList();
 
         log('My Category List is .................,><>< ${categoryIdList}');
       }
@@ -218,7 +225,7 @@ class ListingScreenController extends GetxController {
   }
 
   dismissDialog() {
-    categoryTextController.text = '';
+    // categoryTextController.text = '';
     descriptionTextController.text = '';
     titleTextController.text = '';
     image.value = File('');
@@ -230,4 +237,3 @@ class ListingScreenController extends GetxController {
   //   print("ooooooooooooooooooooooooooooooooooooppppppppppppppppppppppppppppppppppppp$categoryNameList");
   // }
 }
-
