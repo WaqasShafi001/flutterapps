@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_question_mark
 
+import 'dart:collection';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -23,14 +24,11 @@ class ListingsScreen extends StatefulWidget {
 
 class _ListingsState extends State<ListingsScreen> {
   var listingController = Get.put(ListingScreenController());
-  List<String> locations = ['A', 'B', 'C', 'D'];
-  String? _selectedLocation;
 
   @override
   void initState() {
     super.initState();
     loadProfile();
-
     getListing();
   }
 
@@ -217,11 +215,6 @@ class _ListingsState extends State<ListingsScreen> {
       {double imgwidth: 200.0}) {
     VideoPost currentPost = listingController.videoCategoryPosts[index];
 
-    print(
-        'wwwwwwwwwwwwwwwwwwwww${currentPost.name} wwwwwwwwww ${currentPost.post!.length}');
-
-    print('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww ${currentPost.post!.toList()}');
-
     return FadeAnimation(
         0.3,
         Container(
@@ -263,22 +256,35 @@ class _ListingsState extends State<ListingsScreen> {
   }
 
   getVideosBody(BuildContext contex, List<VideoModel> videos) {
-    print(
-        'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx${videos.length}');
+    print('xxxxxxxxxxxxxxxxxxxx${videos.length}');
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: videos.length,
       itemBuilder: (BuildContext context, int index) {
+        // listingController.videoIDForUpdateApi.value =
+        //     videos.map((e) => e.id).toList();
+        // listingController.newVideoIDForUpdateApi
+        //     .addAll(listingController.videoIDForUpdateApi);
+        // listingController.finalListOfIDs.value =
+        //     LinkedHashSet<int?>.from(listingController.newVideoIDForUpdateApi)
+        //         .toList();
+
+        // log('tapped2');
+        // log('this is the video id = = = = = =  = ${listingController.videoIDForUpdateApi} . . . .  ${listingController.finalListOfIDs}');
+
         // VideoModel video = videos[index];
-        return _getVideoItemUI(videos[index]);
+        return _getVideoItemUI(
+          videos[index],
+        );
       },
       padding: EdgeInsets.all(0.0),
     );
   }
 
-  Widget _getVideoItemUI(VideoModel video) {
-    listingController.videoIDForUpdateApi.value = video.id as int;
-    log('this is the video id = = = = = =  = ${listingController.videoIDForUpdateApi.value} . . . .  ${video.id}');
+  Widget _getVideoItemUI(
+    VideoModel video,
+  ) {
+    listingController.setid(video);
     return AspectRatio(
       aspectRatio: 1.8 / 1,
       child: InkWell(
@@ -286,7 +292,8 @@ class _ListingsState extends State<ListingsScreen> {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) =>
                   VideoListingDetailScreen(videoObject: video)));
-          print('tapped');
+          //log('tapped ${listingController.idOfVideo.value}    ------ ${video.id}');
+          setState(() {});
         },
         child: Container(
           margin: EdgeInsets.only(right: 15),
@@ -314,7 +321,7 @@ class _ListingsState extends State<ListingsScreen> {
                 children: [
                   Align(
                     alignment: Alignment.topRight,
-                    child: myPopMenu(),
+                    child: myPopMenu(video.id),
                   ),
                   // Align(
                   //   alignment: Alignment.topRight,
@@ -346,9 +353,16 @@ class _ListingsState extends State<ListingsScreen> {
 
     EasyLoading.show(status: 'loading...');
     ApiController().getVideos().then((response) async {
-      log(' ----------------------------------------i am here--------------${response.success}-${response.message}-----------------${response.videosPost.toList()}--------------');
       listingController.videoCategoryPosts.value =
           response.success == true ? response.videosPost.toList() : [];
+      // listingController.listForGetVideoMethod.value =
+      //     response.videosPost.map((e) => e).toList();
+
+      // log('this is the id list of vides = ${listingController.listForGetVideoMethod}');
+      // listingController.listForGetVideoMethod2.value =
+      //     listingController.listForGetVideoMethod.map((e) => e!.id).toList();
+      // log('this is the id list of vides id == ${listingController.listForGetVideoMethod2}');
+
       setState(() {});
       EasyLoading.dismiss();
     });
@@ -371,7 +385,7 @@ class _ListingsState extends State<ListingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Widget myPopMenu() {
+  Widget myPopMenu(int? vidID) {
     return PopupMenuButton(
         icon: Icon(Icons.more_vert, color: Colors.white),
         onSelected: (value) {
@@ -469,6 +483,7 @@ class _ListingsState extends State<ListingsScreen> {
             actions: [
               ElevatedButton(
                   onPressed: () {
+                    print('$vidID');
                     if (listingController.idOfCategory.value == 0 &&
                         listingController.titleTextController.text.isEmpty &&
                         listingController
@@ -484,7 +499,9 @@ class _ListingsState extends State<ListingsScreen> {
                           listingController.videoFile.path.isNotEmpty) {
                         EasyLoading.show(status: 'loading...');
                         Navigator.pop(context);
-                        listingController.updateVideoToNetwork().then((value) {
+                        listingController
+                            .updateVideoToNetwork(videoID: vidID)
+                            .then((value) {
                           setState(() {
                             widget.createState().initState();
                           });

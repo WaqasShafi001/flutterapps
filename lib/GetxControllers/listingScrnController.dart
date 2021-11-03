@@ -6,12 +6,11 @@ import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterapps/GetxControllers/CategoryGetModel.dart';
+import 'package:flutterapps/model/VideoModel.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:video_compress/video_compress.dart';
 import 'package:path/path.dart';
-import 'package:flutter/services.dart' as service;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class ListingScreenController extends GetxController {
@@ -22,7 +21,13 @@ class ListingScreenController extends GetxController {
   var listOfCategoryIDfromAPI = <int?>[].obs;
   var categoryAllList = [].obs;
 
-  var videoIDForUpdateApi = 0.obs;
+////////////////////////////////////////////////////////////////
+
+  var idOfVideo = 0.obs;
+
+  int? setid(VideoModel model) {
+    return idOfVideo.value = model.id!;
+  }
 
   @override
   void onInit() {
@@ -147,7 +152,7 @@ class ListingScreenController extends GetxController {
     print('response data is = ${response.data}');
   }
 
-  Future updateVideoToNetwork() async {
+  Future updateVideoToNetwork({int? videoID}) async {
     dio.FormData formData = dio.FormData.fromMap({
       'image': await dio.MultipartFile.fromFile(
         image.value.path,
@@ -158,7 +163,7 @@ class ListingScreenController extends GetxController {
     });
 
     final response = await dio.Dio().post(
-      'https://starwebapk.com/mobile_api/public/api/updatepost/${videoIDForUpdateApi.value}?category_id=${idOfCategory.value}&title=${titleTextController.text}&description=${descriptionTextController.text}&is_premium=1',
+      'https://starwebapk.com/mobile_api/public/api/updatepost/$videoID?category_id=${idOfCategory.value}&title=${titleTextController.text}&description=${descriptionTextController.text}&is_premium=1',
       data: formData,
       options: dio.Options(
         followRedirects: false,
@@ -169,8 +174,7 @@ class ListingScreenController extends GetxController {
     );
     if (response.data['status'] == true) {
       // isLoading.value = true;
-      print(
-          'this is the id of this current video ${videoIDForUpdateApi.value}');
+
       EasyLoading.dismiss();
       Get.snackbar(
         'congrats!',

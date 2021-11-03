@@ -1,5 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutterapps/GetxControllers/listingScrnController.dart';
+import 'package:get/get.dart';
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'ApiParamModel.dart';
@@ -9,6 +12,7 @@ import 'package:flutterapps/Helper/SharedPrefs.dart';
 
 class ApiController {
   final JsonDecoder _decoder = new JsonDecoder();
+  var listingCtr = Get.put(ListingScreenController());
 
   Future<ApiResponseModel> loginApi(String email, String password) async {
     var url = NetworkConstantsUtil.baseUrl + NetworkConstantsUtil.login;
@@ -64,6 +68,9 @@ class ApiController {
       final ApiResponseModel parsedResponse = await getResponse(response.body);
       log('-=-=-=-=-=-=-=-=-=-=-=-${response.body}');
       print('-=-=-=-=-=-=-=-Parsed Responce=-=-=-=-${parsedResponse.message}');
+      // listingCtr.listForGetVideoMethod.value =
+      //     parsedResponse.videosPost.map((e) => e.id).toList();
+      // log('this is the id list of vides = ${listingCtr.listForGetVideoMethod}');
 
       return parsedResponse;
     });
